@@ -26,3 +26,10 @@ struct SchoolEvent: Identifiable, Hashable, Codable {
         self.detailsURL = detailsURL
     }
 }
+
+struct BlockScheduleItem: Identifiable, Equatable, Codable {
+    var id = UUID()
+    let name: String
+    let timeString: String
+    let isSubBlock: Bool
+}

@@ -6,6 +6,7 @@ import Combine
 class CalendarViewModel: ObservableObject {
     @Published var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     @Published var eventsByDate: [Date: [SchoolEvent]] = [:]
+    @Published var cachedBlockSchedules: [UUID: [BlockScheduleItem]] = [:]
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -16,6 +17,7 @@ class CalendarViewModel: ObservableObject {
     func changeDate(by days: Int) {
         if let newDate = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) {
             selectedDate = newDate
+            prefetchBlockDetails(for: newDate)
         }
     }
     
@@ -53,12 +55,34 @@ class CalendarViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.eventsByDate = grouped
                     self.isLoading = false
+                    self.prefetchBlockDetails(for: self.selectedDate)
                 }
             } catch {
                 DispatchQueue.main.async {
                     self.errorMessage = error.localizedDescription
                     self.isLoading = false
                     print("Error fetching events: \(error)")
+                }
+            }
+        }
+    }
+    private func prefetchBlockDetails(for date: Date) {
+        let eventsOnDate = events(for: date)
+        for event in eventsOnDate {
+            if event.categories == ["Block Schedule"], let url = event.detailsURL {
+                if cachedBlockSchedules[event.id] == nil {
+                    Task {
+                        do {
+                            let fetcher = CalendarFetcher()
+                            let html = try await fetcher.fetchCalendarHTML(url: url)
+                            let parsedSchedule = HTMLTableParser.parseSchedule(from: html)
+                            DispatchQueue.main.async {
+                                self.cachedBlockSchedules[event.id] = parsedSchedule
+                            }
+                        } catch {
+                            print("Error prefetching block schedule: \(error)")
+                        }
+                    }
                 }
             }
         }
