@@ -47,9 +47,11 @@ class HTMLTableParser {
                 // Clean up any remaining entities
                 name = name.replacingOccurrences(of: "&nbsp;", with: " ")
                            .replacingOccurrences(of: "&#160;", with: " ")
+                           .replacingOccurrences(of: "&amp;", with: "&")
                            .trimmingCharacters(in: .whitespacesAndNewlines)
                 timeString = timeString.replacingOccurrences(of: "&nbsp;", with: " ")
                                        .replacingOccurrences(of: "&#160;", with: " ")
+                                       .replacingOccurrences(of: "&amp;", with: "&")
                                        .replacingOccurrences(of: "–", with: "-") // dash normalization
                                        .trimmingCharacters(in: .whitespacesAndNewlines)
                 
