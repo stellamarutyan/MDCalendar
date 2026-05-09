@@ -17,14 +17,14 @@ struct SettingsView: View {
         NavigationView {
             List {
                 Section(header: Text("Class Names (Block Schedule)").font(.subheadline)) {
-                    HStack { Text("Block 1").frame(width: 65, alignment: .leading); TextField("Class name", text: $block1) }
-                    HStack { Text("Block 2").frame(width: 65, alignment: .leading); TextField("Class name", text: $block2) }
-                    HStack { Text("Block 3").frame(width: 65, alignment: .leading); TextField("Class name", text: $block3) }
-                    HStack { Text("Block 4").frame(width: 65, alignment: .leading); TextField("Class name", text: $block4) }
-                    HStack { Text("Block 5").frame(width: 65, alignment: .leading); TextField("Class name", text: $block5) }
-                    HStack { Text("Block 6").frame(width: 65, alignment: .leading); TextField("Class name", text: $block6) }
-                    HStack { Text("Block 7").frame(width: 65, alignment: .leading); TextField("Class name", text: $block7) }
-                    HStack { Text("Block 8").frame(width: 65, alignment: .leading); TextField("Class name", text: $block8) }
+                    HStack { Text("Block 1").frame(width: 80, alignment: .leading); TextField("Class name", text: $block1) }
+                    HStack { Text("Block 2").frame(width: 80, alignment: .leading); TextField("Class name", text: $block2) }
+                    HStack { Text("Block 3").frame(width: 80, alignment: .leading); TextField("Class name", text: $block3) }
+                    HStack { Text("Block 4").frame(width: 80, alignment: .leading); TextField("Class name", text: $block4) }
+                    HStack { Text("Block 5").frame(width: 80, alignment: .leading); TextField("Class name", text: $block5) }
+                    HStack { Text("Block 6").frame(width: 80, alignment: .leading); TextField("Class name", text: $block6) }
+                    HStack { Text("Block 7").frame(width: 80, alignment: .leading); TextField("Class name", text: $block7) }
+                    HStack { Text("Block 8").frame(width: 80, alignment: .leading); TextField("Class name", text: $block8) }
                 }
                 
                 Section(header: Text("Show in Calendar").font(.subheadline)) {

@@ -68,15 +68,17 @@ struct EventRowView: View {
                                     } else {
                                         Text(parts.primary)
                                             .fontWeight(.semibold)
-                                            .frame(width: 110, alignment: .topLeading)
+                                            .frame(width: 90, alignment: .topLeading)
                                             .fixedSize(horizontal: false, vertical: true)
                                         
                                         Text(parts.secondary)
                                             .fontWeight(.semibold)
                                     }
-                                    Spacer()
+                                    Spacer(minLength: 8)
                                     Text(item.timeString)
                                         .foregroundColor(.secondary)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                        .layoutPriority(1)
                                 }
                                 .font(.subheadline)
                                 Divider()
