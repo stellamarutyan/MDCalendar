@@ -94,13 +94,24 @@ class CalendarParser {
         // Categories
         var categories: [String] = []
         if let catStr = data["CATEGORIES"] ?? data["Categories"] {
-            categories = catStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces).unescaped() }
+            categories = catStr.components(separatedBy: ",").map {
+                var cat = $0.trimmingCharacters(in: .whitespaces).unescaped()
+                while cat.hasSuffix("\\") { cat.removeLast() }
+                return cat
+            }
         }
         
         // Description
         // Keep HTML tags, but unescape ICS characters
         let rawDescription = data["DESCRIPTION"] ?? ""
-        let description = rawDescription.unescaped()
+        var description = rawDescription.unescaped()
+        
+        // Remove "Read more" links
+        description = description.replacingOccurrences(
+            of: "\\s*<a[^>]*>Read more</a>",
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
         
         // URL
         // Sometimes URL is in URL field, sometimes in description? ICS standard has URL field.

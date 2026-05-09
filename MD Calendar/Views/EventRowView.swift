@@ -6,7 +6,6 @@ struct EventRowView: View {
     
     @State private var isExpanded = false
     @State private var showingSafari = false
-    @State private var showingBlockSettings = false
     
     @AppStorage("block1Setting") private var block1: String = ""
     @AppStorage("block2Setting") private var block2: String = ""
@@ -32,16 +31,6 @@ struct EventRowView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                                 .fixedSize(horizontal: false, vertical: true) // Allow multiline title
-                            
-                            if isConfigurableBlock(event: event) {
-                                Button(action: {
-                                    showingBlockSettings = true
-                                }) {
-                                    Image(systemName: "pencil")
-                                        .foregroundColor(.blue)
-                                }
-                                .buttonStyle(BorderlessButtonStyle())
-                            }
                         }
                         
                         Text(event.timeLocationString)
@@ -72,12 +61,16 @@ struct EventRowView: View {
                             ForEach(schedule) { item in
                                 let parts = splitName(customName(for: item.name))
                                 HStack(alignment: .top) {
-                                    Text(parts.primary)
-                                        .fontWeight(.semibold)
-                                        .frame(width: 110, alignment: .topLeading)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    
-                                    if !parts.secondary.isEmpty {
+                                    if parts.secondary.isEmpty {
+                                        Text(parts.primary)
+                                            .fontWeight(.semibold)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    } else {
+                                        Text(parts.primary)
+                                            .fontWeight(.semibold)
+                                            .frame(width: 110, alignment: .topLeading)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                        
                                         Text(parts.secondary)
                                             .fontWeight(.semibold)
                                     }
@@ -132,9 +125,6 @@ struct EventRowView: View {
             }
         }
         .padding(.vertical, 8)
-        .sheet(isPresented: $showingBlockSettings) {
-            BlockSettingsView()
-        }
     }
     
     private func isConfigurableBlock(event: SchoolEvent) -> Bool {

@@ -2,7 +2,9 @@ import SwiftUI
 
 
 struct ContentView: View {
+    @Environment(\.scenePhase) var scenePhase
     @StateObject private var viewModel = CalendarViewModel()
+    @State private var showingSettings = false
     
     var body: some View {
         let dailyEvents = viewModel.events(for: viewModel.selectedDate)
@@ -42,13 +44,17 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal)
+                .padding(.bottom, 10)
                 .background(backgroundColor(for: dailyEvents).ignoresSafeArea(edges: .top))
                 
-                Divider()
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 1)
+                    .allowsHitTesting(false)
                 
                 // Events List for Selected Day
                 
-                if dailyEvents.isEmpty {
+                if viewModel.isLoading && viewModel.eventsByDate.isEmpty {
                     VStack {
                         Spacer()
                         ProgressView()
@@ -56,13 +62,25 @@ struct ContentView: View {
                         Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if dailyEvents.isEmpty {
+                    VStack {
+                        Spacer()
+                        Text("No events scheduled")
+                            .foregroundColor(.secondary)
+                            .font(.title3)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 0) {
                             ForEach(dailyEvents) { event in
-                                EventRowView(event: event, cachedSchedule: viewModel.cachedBlockSchedules[event.id])
+                                EventRowView(event: event, cachedSchedule: viewModel.cachedBlockSchedules[event.id]?.schedule)
                                     .padding(.horizontal)
-                                Divider()
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 1)
+                                    .allowsHitTesting(false)
                             }
                         }
                         .padding(.vertical)
@@ -71,6 +89,42 @@ struct ContentView: View {
             }
             .onAppear {
                 viewModel.fetchEvents()
+            }
+            .onChange(of: scenePhase) { oldPhase, newPhase in
+                if newPhase == .active {
+                    viewModel.syncIfNeeded()
+                }
+            }
+            .gesture(
+                DragGesture(minimumDistance: 40)
+                    .onEnded { value in
+                        // Only trigger if the drag is primarily horizontal
+                        if abs(value.translation.width) > abs(value.translation.height) {
+                            if value.translation.width < 0 {
+                                // Swiped left -> Next day
+                                viewModel.changeDate(by: 1)
+                            } else if value.translation.width > 0 {
+                                // Swiped right -> Previous day
+                                viewModel.changeDate(by: -1)
+                            }
+                        }
+                    }
+            )
+            .sheet(isPresented: $showingSettings) {
+                SettingsView(viewModel: viewModel)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Button(action: { showingSettings = true }) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(12)
+                        .background(Color(red: 183/255.0, green: 28/255.0, blue: 28/255.0))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                }
+                .padding(.trailing, 15)
+                .padding(.bottom, 15)
             }
     }
     
